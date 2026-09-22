@@ -1,6 +1,8 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/CravingCrates/AnkiCollab-Backend
+	branch = main
 [submodule "website"]
 	path = website
 	url = https://github.com/CravingCrates/AnkiCollab-Website
+	branch = main
