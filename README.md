@@ -49,12 +49,18 @@ if you don't want submodules.)
 3. Build and start everything:
 
    ```bash
-   docker compose up --build
+   docker compose --env-file .env.docker up --build
    ```
 
    First run compiles two Rust workspaces from scratch, so expect it to
    take a while. Subsequent runs reuse Docker's layer cache.
 
+4. Point the Anki add-on at `http://plugin.localhost`: The easiest way for that is to navigate to the addons folder in anki, open the AnkiCollab folder (`1957538407` or whatever test folder you're using), and edit the URL inside `var_defs.py` to: 
+   ```
+   API_BASE_URL = "http://plugin.localhost"
+   ```
+
+Next, you can open the website in the browser: http://localhost and the Add-on will interact with the backend server.
 ## What's running
 
 | Service | What it is | Reachable at |
@@ -66,22 +72,9 @@ if you don't want submodules.)
 | `website` | the Rust website | `localhost` / `www.localhost` (via nginx) directly |
 | `nginx` | reverse proxy, replicates `nginx_localhost_example` | `localhost:80` |
 
-Point the Anki add-on at `http://plugin.localhost`:
-The easiest way for that is to navigate to the addons folder in anki, open the AnkiCollab folder (`1957538407` or whatever test folder you're using), and edit the URL inside `var_defs.py` to: 
-```
-API_BASE_URL = "http://plugin.localhost"
-```
+## Known unknowns
 
-## Known unknowns — please verify against source
-
-I put this together from the repos' Cargo.toml/.env.example/nginx example
-files, not by reading `main.rs`, so a few things are educated assumptions
-rather than certainties:
-
-- **`SENTRY_URL`/`DISCORD_WEBHOOK_URL` left blank/dummy.** If either
-  app panics on an empty/fake value instead of treating it as "disabled",
-  you'll need to either stub those integrations behind a feature flag or
-  provide real-looking values.
+- **`SENTRY_URL`/`DISCORD_WEBHOOK_URL` left blank/dummy.** The Webhook is only used to log account removals for GDPR compliance in case of a outage and the SENTRY_URL is unnecessary in a local setup as you don't need remote error reports at that point.
 - **CF-Connecting-IP trust.** nginx sets this header (spoofing what
   Cloudflare would send in production) and the app is expected to trust
   it. Fine for local dev since nginx is now always in front, but worth
